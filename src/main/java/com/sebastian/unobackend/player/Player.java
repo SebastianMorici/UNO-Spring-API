@@ -1,7 +1,7 @@
 package com.sebastian.unobackend.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sebastian.unobackend.table.Table;
+import com.sebastian.unobackend.unotable.UnoTable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -30,13 +30,13 @@ public class Player implements Serializable {
     // Associations
     @JsonIgnore
     @OneToMany(mappedBy = "playerOne")
-    private Set<Table> playerOneTables = new HashSet<>();
+    private Set<UnoTable> playerOneUnoTables = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "playerTwo")
-    private Set<Table> playerTwoTables = new HashSet<>();
+    private Set<UnoTable> playerTwoUnoTables = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "playerThree")
-    private Set<Table> playerThreeTables = new HashSet<>();
+    private Set<UnoTable> playerThreeUnoTables = new HashSet<>();
 }

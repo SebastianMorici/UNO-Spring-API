@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.table;
+package com.sebastian.unobackend.unotable;
 
 import lombok.*;
 

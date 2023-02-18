@@ -1,21 +1,21 @@
-package com.sebastian.unobackend.table;
+package com.sebastian.unobackend.unotable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sebastian.unobackend.player.Player;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class Table implements Serializable {
+public class UnoTable implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -24,9 +24,18 @@ public class Table implements Serializable {
     private Long turn;
     private Long winner;
     @Transient
+    @JsonIgnore
     private Deck deck;
     @Transient
     private List<Card> playerOneCards, playerTwoCards, playerThreeCards, playedCards;
+
+    public UnoTable(){
+        this.deck = new Deck();
+        this.playerOneCards = new ArrayList<>();
+        this.playerTwoCards = new ArrayList<>();
+        this.playerThreeCards = new ArrayList<>();
+        this.playedCards = new ArrayList<>();
+    }
 
     // Associations
     @ManyToOne
