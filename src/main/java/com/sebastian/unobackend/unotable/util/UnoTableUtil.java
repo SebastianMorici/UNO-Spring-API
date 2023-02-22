@@ -1,6 +1,6 @@
 package com.sebastian.unobackend.unotable.util;
 
-import com.sebastian.unobackend.unotable.Card;
+import com.sebastian.unobackend.card.Card;
 
 import java.util.List;
 

@@ -3,10 +3,7 @@ package com.sebastian.unobackend.unotable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +32,15 @@ public class UnoTableController {
         return ResponseEntity.status(HttpStatus.OK).body(unoTableService.initialize(id));
     }
 
+    @PostMapping("/uno_tables/{id}/play")
+    public ResponseEntity<UnoTable> play(@PathVariable Long id, @RequestBody Play play) {
+        return ResponseEntity.status(HttpStatus.OK).body(unoTableService.play(id, play));
+    }
+
+    @GetMapping("/uno_tables/{id}/refresh")
+    public ResponseEntity<UnoTable> refresh(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(unoTableService.refresh(id));
+    }
 
 
 }

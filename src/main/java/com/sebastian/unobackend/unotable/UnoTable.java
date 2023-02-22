@@ -1,6 +1,7 @@
 package com.sebastian.unobackend.unotable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.player.Player;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -24,17 +26,29 @@ public class UnoTable implements Serializable {
     private Long turn;
     private Long winner;
     @Transient
-    @JsonIgnore
-    private Deck deck;
+    private boolean reverse = false;
     @Transient
-    private List<Card> playerOneCards, playerTwoCards, playerThreeCards, playedCards;
+    private List<Card> deck, playerOneCards, playerTwoCards, playerThreeCards, playedCards;
 
     public UnoTable(){
-        this.deck = new Deck();
+        this.deck = new ArrayList<>();
         this.playerOneCards = new ArrayList<>();
         this.playerTwoCards = new ArrayList<>();
         this.playerThreeCards = new ArrayList<>();
         this.playedCards = new ArrayList<>();
+    }
+
+    public void shuffleDeck() {
+        Collections.shuffle(this.deck);
+    }
+
+    public void deal (int amount, List<Card> receiver) {
+        for (int i = 0; i < amount; i++) {
+            if (this.deck.isEmpty()) break;
+
+            Card card = this.deck.remove(0);
+            receiver.add(card);
+        }
     }
 
     // Associations
