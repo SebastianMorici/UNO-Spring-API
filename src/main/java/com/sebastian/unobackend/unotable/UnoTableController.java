@@ -37,6 +37,11 @@ public class UnoTableController {
         return ResponseEntity.status(HttpStatus.OK).body(unoTableService.play(id, play));
     }
 
+    @GetMapping("/uno_tables/{id}/players/{playerId}/draw")
+    public ResponseEntity<UnoTable> drawCard(@PathVariable Long id, @PathVariable Long playerId) {
+        return ResponseEntity.status(HttpStatus.OK).body(unoTableService.drawCard(id, playerId));
+    }
+
     @GetMapping("/uno_tables/{id}/refresh")
     public ResponseEntity<UnoTable> refresh(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(unoTableService.refresh(id));

@@ -1,6 +1,7 @@
 package com.sebastian.unobackend.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.unotable.UnoTable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +9,9 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,6 +29,9 @@ public class Player implements Serializable {
     @Size(min = 2, max = 30, message = "Name's length must be between 2 and 30")
     @Column(unique = true)
     private String name;
+
+    @Transient
+    private List<Card> deck = new ArrayList<>();
 
     // Associations
     @JsonIgnore

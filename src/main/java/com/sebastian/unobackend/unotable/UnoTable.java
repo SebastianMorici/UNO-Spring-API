@@ -25,16 +25,17 @@ public class UnoTable implements Serializable {
     private boolean isFull = false;
     private Long turn;
     private Long winner;
+    private Card.Color currentColor;
     @Transient
     private boolean reverse = false;
     @Transient
-    private List<Card> deck, playerOneCards, playerTwoCards, playerThreeCards, playedCards;
+    @JsonIgnore
+    private List<Card> deck;
+    @Transient
+    private List<Card> playedCards;
 
     public UnoTable(){
         this.deck = new ArrayList<>();
-        this.playerOneCards = new ArrayList<>();
-        this.playerTwoCards = new ArrayList<>();
-        this.playerThreeCards = new ArrayList<>();
         this.playedCards = new ArrayList<>();
     }
 

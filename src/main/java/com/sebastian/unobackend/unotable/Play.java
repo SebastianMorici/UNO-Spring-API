@@ -7,4 +7,5 @@ import lombok.Getter;
 public class Play {
     private Long playerId;
     private Card card;
+    private Card.Color color;
 }
