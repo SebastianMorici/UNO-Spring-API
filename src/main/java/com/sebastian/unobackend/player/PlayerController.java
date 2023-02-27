@@ -51,9 +51,14 @@ public class PlayerController {
     }
 
     @PostMapping("/players/{playerId}/search_game")
-    public ResponseEntity<String> searchGame(@PathVariable Long playerId) {
-        return ResponseEntity.status(HttpStatus.OK).body("{ \"id\": " + playerService.searchGame(playerId) + " }");
+    public ResponseEntity<UnoTable> searchGame(@PathVariable Long playerId) {
+        return ResponseEntity.status(HttpStatus.OK).body(playerService.searchGame(playerId));
     }
+
+//    @PostMapping("/players/{playerId}/search_game")
+//    public ResponseEntity<String> searchGame(@PathVariable Long playerId) {
+//        return ResponseEntity.status(HttpStatus.OK).body("{ \"id\": " + playerService.searchGame(playerId) + " }");
+//    }
 
 
 }

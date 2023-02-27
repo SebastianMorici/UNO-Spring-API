@@ -11,4 +11,7 @@ public interface UnoTableService {
     UnoTable play(Long unoTableId, Play play) throws UnoTableNotInitializedException, PlayerNotFoundException;
     UnoTable drawCard(Long unoTableId, Long playerId) throws UnoTableNotInitializedException, PlayerNotFoundException;
     UnoTable refresh(Long id) throws UnoTableNotFoundException;
+    void delete(Long id) throws UnoTableNotFoundException;
+    boolean changed(Long id, int[] decksSize);
+    void clearUnoTable(Long id);
 }

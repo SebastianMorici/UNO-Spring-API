@@ -32,8 +32,8 @@ public class UnoTableServiceImpl implements UnoTableService {
       if (unoTable != null) return unoTable;
 
       unoTable = unoTableRepository
-            .findById(unoTableId)
-            .orElseThrow(() -> new UnoTableNotFoundException(unoTableId));
+           .findById(unoTableId)
+           .orElseThrow(() -> new UnoTableNotFoundException(unoTableId));
       // Set turn randomly
       Long id1 = unoTable.getPlayerOne().getId();
       Long id2 = unoTable.getPlayerTwo().getId();
@@ -65,11 +65,11 @@ public class UnoTableServiceImpl implements UnoTableService {
 
       Player[] players = {unoTable.getPlayerOne(), unoTable.getPlayerTwo(), unoTable.getPlayerThree()};
       Player player = Arrays.stream(players)
-            .filter(p -> p.getId().equals(play.getPlayerId()))
-            .findFirst()
-            .orElse(null);
+           .filter(p -> p.getId().equals(play.getPlayerId()))
+           .findFirst()
+           .orElse(null);
 
-      if(player == null) throw new PlayerNotFoundException(play.getPlayerId());
+      if (player == null) throw new PlayerNotFoundException(play.getPlayerId());
 
       List<Card> playerCards = player.getDeck();
 
@@ -83,26 +83,27 @@ public class UnoTableServiceImpl implements UnoTableService {
 
       // Verifies playedCard has the same Color or Value of the lastPlayedCard
       if (!(playedCard.getColor().equals(unoTable.getCurrentColor()) ||
-            playedCard.getValue().equals(lastPlayedCard.getValue()) ||
-            playedCard.getColor().equals(Card.Color.BLACK))) {
+           playedCard.getValue().equals(lastPlayedCard.getValue()) ||
+           playedCard.getColor().equals(Card.Color.BLACK))) {
          return unoTable;
       }
 
       // Adds the play.card to playedCard and removes it from the player's deck
       unoTable.getPlayedCards().add(playedCard);
       playerCards.remove(playedCard);
+      // Sets currentColor to the lastPlayed's color
+      unoTable.setCurrentColor(playedCard.getColor());
       // If the card was the last one of his/her deck, there is a winner and the game ends.
       if (playerCards.isEmpty()) {
          unoTable.setWinner(player.getId());
          unoTableRepository.save(unoTable);
          return unoTable;
-
       }
 
       int currentTurnIndex = IntStream.range(0, players.length)
-            .filter(i -> unoTable.getTurn().equals(players[i].getId()))
-            .findFirst()
-            .orElse(-1);
+           .filter(i -> unoTable.getTurn().equals(players[i].getId()))
+           .findFirst()
+           .orElse(-1);
 
 
       boolean isSkip = false;
@@ -150,26 +151,39 @@ public class UnoTableServiceImpl implements UnoTableService {
 
       Player[] players = {unoTable.getPlayerOne(), unoTable.getPlayerTwo(), unoTable.getPlayerThree()};
       Player player = Arrays.stream(players)
-            .filter(p -> p.getId().equals(playerId))
-            .findFirst()
-            .orElse(null);
+           .filter(p -> p.getId().equals(playerId))
+           .findFirst()
+           .orElse(null);
 
-      if(player == null) throw new PlayerNotFoundException(playerId);
+      if (player == null) throw new PlayerNotFoundException(playerId);
 
       // Verifies if it's his turn
       if (!(unoTable.getTurn().equals(player.getId()))) return unoTable;
 
       unoTable.deal(1, player.getDeck());
+      // If deck has only one card left, collects all the cards from the playedCards and adds them to deck
+      if (unoTable.getDeck().size() <= 1) {
+         List<Card> cardsFromPlayedCards = unoTable.getPlayedCards().subList(0, unoTable.getPlayedCards().size() - 1);
+         unoTable.getDeck().addAll(cardsFromPlayedCards);
+         unoTable.shuffleDeck();
+      }
 
       int currentTurnIndex = IntStream.range(0, players.length)
-            .filter(i -> unoTable.getTurn().equals(players[i].getId()))
-            .findFirst()
-            .orElse(-1);
+           .filter(i -> unoTable.getTurn().equals(players[i].getId()))
+           .findFirst()
+           .orElse(-1);
 
       Long newTurn = UnoTableUtil.switchTurn(players, currentTurnIndex, unoTable.isReverse(), false);
       unoTable.setTurn(newTurn);
 
       return unoTable;
+   }
+
+   @Override
+   public boolean changed(Long unoTableId, int[] decksSize) {
+      return (decksSize[0] != unoTable.getPlayerOne().getDeck().size()) ||
+           (decksSize[1] != unoTable.getPlayerTwo().getDeck().size()) ||
+           (decksSize[2] != unoTable.getPlayerThree().getDeck().size());
    }
 
    @Override
@@ -180,16 +194,30 @@ public class UnoTableServiceImpl implements UnoTableService {
    @Override
    public UnoTable findById(Long id) {
       return unoTableRepository
-            .findById(id)
-            .orElseThrow(() -> new UnoTableNotFoundException(id));
+           .findById(id)
+           .orElseThrow(() -> new UnoTableNotFoundException(id));
+   }
+
+   @Override
+   public void delete(Long id) {
+      UnoTable unoTable = unoTableRepository
+           .findById(id)
+           .orElseThrow(() -> new UnoTableNotFoundException(id));
+      unoTableRepository.delete(unoTable);
    }
 
    public UnoTable refresh(Long id) {
       if (unoTable != null && unoTable.getId().equals(id)) return unoTable;
       return unoTableRepository
-            .findById(id)
-            .orElseThrow(() -> new UnoTableNotFoundException(id));
+           .findById(id)
+           .orElseThrow(() -> new UnoTableNotFoundException(id));
    }
 
+   @Override
+   public void clearUnoTable(Long unoTableId) {
+      if (unoTable == null) return;
+      if (!unoTable.getId().equals(unoTableId)) return;
+      unoTable = null;
+   }
 
 }

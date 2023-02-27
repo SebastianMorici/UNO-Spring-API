@@ -11,6 +11,7 @@ public interface PlayerService {
     Player update(Long id, Player updatedPlayer) throws PlayerNotFoundException;
     void delete(Long id) throws PlayerNotFoundException;
     Player login(Player loginPlayer) throws PlayerNotFoundException;
-    Long searchGame(Long playerId);
+    UnoTable searchGame(Long playerId);
+//    Long searchGame(Long playerId);
 
 }
