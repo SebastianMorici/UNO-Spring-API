@@ -1,8 +1,9 @@
 package com.sebastian.unobackend.exception;
 
+import com.sebastian.unobackend.association.GamePlayerNotFoundException;
 import com.sebastian.unobackend.player.PlayerNotFoundException;
-import com.sebastian.unobackend.unotable.UnoTableNotFoundException;
-import com.sebastian.unobackend.unotable.UnoTableNotInitializedException;
+import com.sebastian.unobackend.game.GameNotFoundException;
+import com.sebastian.unobackend.game.GameNotInitializedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Date;
 import java.util.List;
@@ -27,16 +26,22 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
     }
 
-    @ExceptionHandler(UnoTableNotFoundException.class)
-    public final ResponseEntity<ExceptionResponse> handleUnoTableNotFoundException(UnoTableNotFoundException ex, WebRequest request) {
+    @ExceptionHandler(GameNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleGameNotFoundException(GameNotFoundException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
     }
 
-    @ExceptionHandler(UnoTableNotInitializedException.class)
-    public final ResponseEntity<ExceptionResponse> handleUnoTableNotInitializedException(UnoTableNotInitializedException ex, WebRequest request) {
+    @ExceptionHandler(GameNotInitializedException.class)
+    public final ResponseEntity<ExceptionResponse> handleGameNotInitializedException(GameNotInitializedException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exceptionResponse);
+    }
+
+    @ExceptionHandler(GamePlayerNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleGamePlayerNotFoundException(GamePlayerNotFoundException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

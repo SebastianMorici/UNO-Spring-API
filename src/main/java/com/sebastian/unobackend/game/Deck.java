@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.unotable;
+package com.sebastian.unobackend.game;
 
 import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.card.CardService;
@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

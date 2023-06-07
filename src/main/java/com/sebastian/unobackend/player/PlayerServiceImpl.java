@@ -1,8 +1,12 @@
 package com.sebastian.unobackend.player;
 
-import com.sebastian.unobackend.player.util.RandomId;
-import com.sebastian.unobackend.unotable.UnoTable;
-import com.sebastian.unobackend.unotable.UnoTableRepository;
+import com.sebastian.unobackend.association.GamePlayer;
+import com.sebastian.unobackend.association.GamePlayerId;
+import com.sebastian.unobackend.association.GamePlayerNotFoundException;
+import com.sebastian.unobackend.association.GamePlayerRepository;
+import com.sebastian.unobackend.game.Game;
+import com.sebastian.unobackend.game.GameRepository;
+import org.hibernate.Session;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +17,15 @@ import java.util.List;
 public class PlayerServiceImpl implements PlayerService {
 
    private final PlayerRepository playerRepository;
-   private final UnoTableRepository unoTableRepository;
+   private final GameRepository gameRepository;
+   private final GamePlayerRepository gamePlayerRepository;
 
    @Autowired
-   public PlayerServiceImpl(PlayerRepository playerRepository, UnoTableRepository unoTableRepository) {
+   public PlayerServiceImpl(PlayerRepository playerRepository, GameRepository gameRepository,
+                            GamePlayerRepository gamePlayerRepository) {
       this.playerRepository = playerRepository;
-      this.unoTableRepository = unoTableRepository;
+      this.gameRepository = gameRepository;
+      this.gamePlayerRepository = gamePlayerRepository;
    }
 
    @Override
@@ -62,59 +69,65 @@ public class PlayerServiceImpl implements PlayerService {
            .orElseThrow(() -> new PlayerNotFoundException(loginPlayer.getName()));
    }
 
-   public UnoTable searchGame(Long playerId) {
+   public Game searchGame(Long playerId, SearchGameDTO searchGameDTO) {
       Player player = playerRepository
            .findById(playerId)
            .orElseThrow(() -> new PlayerNotFoundException(playerId));
 
-      List<UnoTable> nonFullUnoTables = unoTableRepository.findByIsFull(false);
-      // Creates a new Table and set playerOne
-      if (nonFullUnoTables.isEmpty()) {
-         UnoTable newUnoTable = new UnoTable();
-         newUnoTable.setPlayerOne(player);
-         return unoTableRepository.save(newUnoTable);
+      List<Game> nonFullGames = gameRepository.findByIsFull(false);
+      // Creates a new game and adds the first player
+      if (nonFullGames.isEmpty()) {
+         Game newGame = new Game();
+         newGame.setNumberOfPlayers(searchGameDTO.numberOfPlayers());
+         Game savedGame = gameRepository.save(newGame);
+         savedGame.addPlayer(player);
+         GamePlayer gamePlayer = savedGame.getPlayers().stream()
+              .filter(gp -> gp.getPlayer().getId().equals(playerId))
+              .findFirst()
+              .orElseThrow(() -> new GamePlayerNotFoundException(savedGame.getId(), playerId));
+         gamePlayerRepository.save(gamePlayer);
+         playerRepository.save(player);
+         return gameRepository.save(savedGame);
       }
-      // table is the las of nonFullTables
-      UnoTable unoTable = nonFullUnoTables.get(nonFullUnoTables.size() - 1);
-      // Set playerTwo
-      if (unoTable.getPlayerTwo() == null) {
-         unoTable.setPlayerTwo(player);
-         return unoTableRepository.save(unoTable);
-      }
-      // Set playerThree
-      unoTable.setPlayerThree(player);
-      // isFull = true
-      unoTable.setFull(true);
-
-      return unoTableRepository.save(unoTable);
+      // Filters the games that matches the numberOfPlayers argument
+      List<Game> gamesToJoin = nonFullGames.stream()
+           .filter(game -> game.getNumberOfPlayers() == searchGameDTO.numberOfPlayers())
+           .toList();
+      // game is the last of gamesToJoin
+      Game game = gamesToJoin.get(gamesToJoin.size() - 1);
+      // Adds the new player to the game
+      game.addPlayer(player);
+      playerRepository.save(player);
+      if (game.getPlayers().size() == game.getNumberOfPlayers()) game.setFull(true);
+      return gameRepository.save(game);
    }
 
-//   public Long searchGame(Long playerId) {
+
+}
+//   public Game searchGameOLD(Long playerId) {
 //      Player player = playerRepository
 //           .findById(playerId)
 //           .orElseThrow(() -> new PlayerNotFoundException(playerId));
 //
-//      List<UnoTable> nonFullUnoTables = unoTableRepository.findByIsFull(false);
-//      // Creates a new Table and set playerOne
-//      if (nonFullUnoTables.isEmpty()) {
-//         UnoTable newUnoTable = new UnoTable();
-//         newUnoTable.setPlayerOne(player);
-//         return unoTableRepository.save(newUnoTable).getId();
+//      List<Game> nonFullGames = gameRepository.findByIsFull(false);
+//      // Creates a new Game and set playerOne
+//      if (nonFullGames.isEmpty()) {
+//         Game newGame = new Game();
+//         newGame.setPlayerOne(player);
+//         return gameRepository.save(newGame);
 //      }
-//      // table is the las of nonFullTables
-//      UnoTable unoTable = nonFullUnoTables.get(nonFullUnoTables.size() - 1);
+//      // game is the last of nonFullGames
+//      Game game = nonFullGames.get(nonFullGames.size() - 1);
 //      // Set playerTwo
-//      if (unoTable.getPlayerTwo() == null) {
-//         unoTable.setPlayerTwo(player);
-//         return unoTableRepository.save(unoTable).getId();
+//      if (game.getPlayerTwo() == null) {
+//         game.setPlayerTwo(player);
+//         return gameRepository.save(game);
 //      }
 //      // Set playerThree
-//      unoTable.setPlayerThree(player);
+//      game.setPlayerThree(player);
 //      // isFull = true
-//      unoTable.setFull(true);
+//      game.setFull(true);
 //
-//      return unoTableRepository.save(unoTable).getId();
+//      return gameRepository.save(game);
 //   }
-}
-
 

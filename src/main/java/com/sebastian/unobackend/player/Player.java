@@ -1,18 +1,18 @@
 package com.sebastian.unobackend.player;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sebastian.unobackend.association.GamePlayer;
 import com.sebastian.unobackend.card.Card;
-import com.sebastian.unobackend.unotable.UnoTable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -20,29 +20,34 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Player implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name = "id", nullable = false)
+   private Long id;
 
-    @NotNull(message = "Name is required")
-    @Size(min = 2, max = 30, message = "Name's length must be between 2 and 30")
-    @Column(unique = true)
-    private String name;
+   @NotNull(message = "Name is required")
+   @Size(min = 2, max = 30, message = "Name's length must be between 2 and 30")
+   @Column(unique = true)
+   private String name;
 
-    @Transient
-    private List<Card> deck = new ArrayList<>();
+   // Associations
+   @JsonIgnore
+   @OneToMany(
+        mappedBy = "player",
+        cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE},
+        orphanRemoval = true)
+   private Set<GamePlayer> games = new HashSet<>();
 
-    // Associations
-    @JsonIgnore
-    @OneToMany(mappedBy = "playerOne")
-    private Set<UnoTable> playerOneUnoTables = new HashSet<>();
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      Player player = (Player) o;
+      return Objects.equals(id, player.id) && Objects.equals(name, player.name);
+   }
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "playerTwo")
-    private Set<UnoTable> playerTwoUnoTables = new HashSet<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "playerThree")
-    private Set<UnoTable> playerThreeUnoTables = new HashSet<>();
+   @Override
+   public int hashCode() {
+      return Objects.hash(id, name);
+   }
 }

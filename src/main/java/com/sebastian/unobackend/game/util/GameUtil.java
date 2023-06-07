@@ -1,18 +1,19 @@
-package com.sebastian.unobackend.unotable.util;
+package com.sebastian.unobackend.game.util;
 
+import com.sebastian.unobackend.association.GamePlayer;
 import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.player.Player;
 
 import java.util.List;
 
-public class UnoTableUtil {
+public class GameUtil {
    public static Card getLastCard(List<Card> cards) {
       if (cards.isEmpty()) return null;
 
       return cards.get(cards.size() - 1);
    }
 
-   public static Long switchTurn(Player[] players, int currentTurnIndex, boolean isReverse, boolean isSkip) {
+   public static Long switchTurn(GamePlayer[] players, int currentTurnIndex, boolean isReverse, boolean isSkip) {
       int newTurnIndex;
 //      Long[] playersId = Arrays.stream(players).map(Player::getId).toArray(Long[]::new);
 
@@ -27,10 +28,10 @@ public class UnoTableUtil {
       }
 
 //      return playersId[newTurnIndex];
-      return players[newTurnIndex].getId();
+      return players[newTurnIndex].getPlayer().getId();
    }
 
-   public static List<Card> getNextPlayerDeck(Player[] players, int currentTurnIndex, boolean isReverse) {
+   public static List<Card> getNextPlayerDeck(GamePlayer[] players, int currentTurnIndex, boolean isReverse) {
       int newTurnIndex;
 
       if (isReverse) {
@@ -40,7 +41,7 @@ public class UnoTableUtil {
          newTurnIndex = (currentTurnIndex + 1) % players.length;
 
       }
-      return players[newTurnIndex].getDeck();
+      return players[newTurnIndex].getPlayerDeck();
    }
 
 //   public static void main(String[] args) {
