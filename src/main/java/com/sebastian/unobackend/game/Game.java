@@ -26,6 +26,7 @@ public class Game implements Serializable {
    private Long turn;
    private Long winner;
    private Card.Color currentColor;
+   private Card.Value currentValue;
    private boolean reverse = false;
 
    // Associations

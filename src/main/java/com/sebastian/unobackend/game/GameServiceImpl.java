@@ -51,10 +51,13 @@ public class GameServiceImpl implements GameService {
          game.deal(7, gamePlayer.getPlayerDeck());
       }
       // Deals one card to playedCards
+      List<Card> playedCards = game.getPlayedCards();
       do {
-         game.deal(1, game.getPlayedCards());
-      } while (GameUtil.getLastCard(game.getPlayedCards()).getColor() == Card.Color.BLACK);
+         game.deal(1, playedCards);
+      } while (GameUtil.getLastCard(playedCards).getColor() == Card.Color.BLACK);
 
+      game.setCurrentColor(GameUtil.getLastCard(playedCards).getColor());
+      game.setCurrentValue(GameUtil.getLastCard(playedCards).getValue());
       return gameRepository.save(game);
    }
 
@@ -78,10 +81,13 @@ public class GameServiceImpl implements GameService {
       if (!(game.getTurn().equals(gamePlayer.getPlayer().getId()))) return game;
       // Verifies if he has the played card
       List<Card> playerCards = gamePlayer.getPlayerDeck();
-      if (!playerCards.contains(playDto.card())) return game;
+      Card playedCard = playerCards.stream()
+           .filter(c -> c.equals(playDto.card()))
+           .findFirst()
+           .orElse(null);
+      if (playedCard == null) return game;
 
       Card lastPlayedCard = GameUtil.getLastCard(game.getPlayedCards());
-      Card playedCard = playDto.card();
 
       // Verifies playedCard has the same Color or Value of the lastPlayedCard
       if (!(playedCard.getColor().equals(game.getCurrentColor()) ||
