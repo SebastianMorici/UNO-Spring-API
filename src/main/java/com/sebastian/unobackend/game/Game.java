@@ -30,7 +30,7 @@ public class Game implements Serializable {
    private boolean reverse = false;
 
    // Associations
-   @JsonIgnore
+//   @JsonIgnore
    @ManyToMany
    @JoinTable(name = "main_deck",
         joinColumns = @JoinColumn(name = "game_id"),
@@ -85,4 +85,5 @@ public class Game implements Serializable {
    public int hashCode() {
       return getClass().hashCode();
    }
+
 }

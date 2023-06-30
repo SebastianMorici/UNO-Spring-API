@@ -1,20 +1,21 @@
 package com.sebastian.unobackend.game;
 
-import com.sebastian.unobackend.player.Player;
+import com.sebastian.unobackend.game.dto.GameDTO;
+import com.sebastian.unobackend.game.dto.PlayDTO;
 import com.sebastian.unobackend.player.PlayerNotFoundException;
 
 import java.util.List;
 
 public interface GameService {
-   List<Game> findAll();
+   List<GameDTO> findAll();
 
-   Game findById(Long id) throws GameNotFoundException;
+   GameDTO findById(Long id) throws GameNotFoundException;
 
-   Game initialize(Long gameId) throws GameNotFoundException;
+   GameDTO initialize(Long gameId) throws GameNotFoundException;
 
-   Game play(Long gameId, Long playerId, PlayDTO playDto) throws GameNotInitializedException, PlayerNotFoundException;
+   GameDTO play(Long gameId, Long playerId, PlayDTO playDto) throws GameNotInitializedException, PlayerNotFoundException;
 
-   Game drawCard(Long gameId, Long playerId) throws GameNotInitializedException, PlayerNotFoundException;
+   GameDTO drawCard(Long gameId, Long playerId) throws GameNotInitializedException, PlayerNotFoundException;
 
 //   Game refresh(Long id) throws GameNotFoundException;
 

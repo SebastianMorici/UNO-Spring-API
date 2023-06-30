@@ -5,12 +5,16 @@ import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.game.Game;
 import com.sebastian.unobackend.player.Player;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.*;
 
 
 @Entity
+@Getter
+@Setter
 @Table(name = "game_player")
 public class GamePlayer implements Serializable {
 
@@ -36,6 +40,7 @@ public class GamePlayer implements Serializable {
         },
         inverseJoinColumns = @JoinColumn(name = "card_id")
    )
+   // TODO: Hacer que las cartas vuelvan de la BD en el mismo orden en el que estaban
    private List<Card> playerDeck = new ArrayList<>();
 
    // Constructors
@@ -46,39 +51,6 @@ public class GamePlayer implements Serializable {
       this.game = game;
       this.player = player;
       this.id = new GamePlayerId(game.getId(), player.getId());
-   }
-
-   // Getters, setters, equals and hashCode
-   public GamePlayerId getId() {
-      return id;
-   }
-
-   public void setId(GamePlayerId id) {
-      this.id = id;
-   }
-
-   public Game getGame() {
-      return game;
-   }
-
-   public void setGame(Game game) {
-      this.game = game;
-   }
-
-   public Player getPlayer() {
-      return player;
-   }
-
-   public void setPlayer(Player player) {
-      this.player = player;
-   }
-
-   public List<Card> getPlayerDeck() {
-      return playerDeck;
-   }
-
-   public void setPlayerDeck(List<Card> playerDeck) {
-      this.playerDeck = playerDeck;
    }
 
    @Override

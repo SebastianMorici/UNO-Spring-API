@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.game;
+package com.sebastian.unobackend.game.dto;
 
 import com.sebastian.unobackend.card.Card;
 

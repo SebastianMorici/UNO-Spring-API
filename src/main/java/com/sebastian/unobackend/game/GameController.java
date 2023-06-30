@@ -1,5 +1,7 @@
 package com.sebastian.unobackend.game;
 
+import com.sebastian.unobackend.game.dto.GameDTO;
+import com.sebastian.unobackend.game.dto.PlayDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +23,17 @@ public class GameController {
     }
 
     @GetMapping("/uno_tables")
-    public ResponseEntity<List<Game>> findAll() {
+    public ResponseEntity<List<GameDTO>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.findAll());
     }
 
     @GetMapping("/uno_tables/{id}")
-    public ResponseEntity<Game> findById(@PathVariable Long id) {
+    public ResponseEntity<GameDTO> findById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.findById(id));
     }
 
     @PostMapping("/uno_tables/{id}/initialize")
-    public ResponseEntity<Game> initialize(@PathVariable Long id) {
+    public ResponseEntity<GameDTO> initialize(@PathVariable Long id) {
         try {
             lock.lock();
             return ResponseEntity.status(HttpStatus.OK).body(gameService.initialize(id));
@@ -47,12 +49,12 @@ public class GameController {
     }
 
     @PostMapping("/uno_tables/{id}/players/{playerId}/play")
-    public ResponseEntity<Game> play(@PathVariable Long id, @PathVariable Long playerId, @RequestBody PlayDTO playDto) {
+    public ResponseEntity<GameDTO> play(@PathVariable Long id, @PathVariable Long playerId, @RequestBody PlayDTO playDto) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.play(id, playerId, playDto));
     }
 
     @GetMapping("/uno_tables/{id}/players/{playerId}/draw")
-    public ResponseEntity<Game> drawCard(@PathVariable Long id, @PathVariable Long playerId) {
+    public ResponseEntity<GameDTO> drawCard(@PathVariable Long id, @PathVariable Long playerId) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.drawCard(id, playerId));
     }
 

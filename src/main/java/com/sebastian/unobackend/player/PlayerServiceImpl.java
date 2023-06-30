@@ -1,12 +1,10 @@
 package com.sebastian.unobackend.player;
 
-import com.sebastian.unobackend.association.GamePlayer;
-import com.sebastian.unobackend.association.GamePlayerId;
-import com.sebastian.unobackend.association.GamePlayerNotFoundException;
-import com.sebastian.unobackend.association.GamePlayerRepository;
+import com.sebastian.unobackend.association.*;
 import com.sebastian.unobackend.game.Game;
+import com.sebastian.unobackend.game.dto.GameDTO;
+import com.sebastian.unobackend.game.dto.GameDTOMapper;
 import com.sebastian.unobackend.game.GameRepository;
-import org.hibernate.Session;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,13 +17,19 @@ public class PlayerServiceImpl implements PlayerService {
    private final PlayerRepository playerRepository;
    private final GameRepository gameRepository;
    private final GamePlayerRepository gamePlayerRepository;
+   private final GameDTOMapper gameDTOMapper;
 
    @Autowired
-   public PlayerServiceImpl(PlayerRepository playerRepository, GameRepository gameRepository,
-                            GamePlayerRepository gamePlayerRepository) {
+   public PlayerServiceImpl(
+        PlayerRepository playerRepository,
+        GameRepository gameRepository,
+        GamePlayerRepository gamePlayerRepository,
+        GameDTOMapper gameDTOMapper
+   ) {
       this.playerRepository = playerRepository;
       this.gameRepository = gameRepository;
       this.gamePlayerRepository = gamePlayerRepository;
+      this.gameDTOMapper = gameDTOMapper;
    }
 
    @Override
@@ -69,7 +73,7 @@ public class PlayerServiceImpl implements PlayerService {
            .orElseThrow(() -> new PlayerNotFoundException(loginPlayer.getName()));
    }
 
-   public Game searchGame(Long playerId, SearchGameDTO searchGameDTO) {
+   public GameDTO searchGame(Long playerId, SearchGameDTO searchGameDTO) {
       Player player = playerRepository
            .findById(playerId)
            .orElseThrow(() -> new PlayerNotFoundException(playerId));
@@ -87,7 +91,8 @@ public class PlayerServiceImpl implements PlayerService {
               .orElseThrow(() -> new GamePlayerNotFoundException(savedGame.getId(), playerId));
          gamePlayerRepository.save(gamePlayer);
          playerRepository.save(player);
-         return gameRepository.save(savedGame);
+
+         return gameDTOMapper.apply(gameRepository.save(savedGame));
       }
       // Filters the games that matches the numberOfPlayers argument
       List<Game> gamesToJoin = nonFullGames.stream()
@@ -99,7 +104,7 @@ public class PlayerServiceImpl implements PlayerService {
       game.addPlayer(player);
       playerRepository.save(player);
       if (game.getPlayers().size() == game.getNumberOfPlayers()) game.setFull(true);
-      return gameRepository.save(game);
+      return gameDTOMapper.apply(gameRepository.save(game));
    }
 
 

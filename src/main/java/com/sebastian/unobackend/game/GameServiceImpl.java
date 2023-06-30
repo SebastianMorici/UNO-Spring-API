@@ -3,17 +3,18 @@ package com.sebastian.unobackend.game;
 import com.sebastian.unobackend.association.GamePlayer;
 import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.card.CardRepository;
-import com.sebastian.unobackend.player.Player;
+import com.sebastian.unobackend.game.dto.GameDTO;
+import com.sebastian.unobackend.game.dto.GameDTOMapper;
+import com.sebastian.unobackend.game.dto.PlayDTO;
 import com.sebastian.unobackend.player.PlayerNotFoundException;
 import com.sebastian.unobackend.game.util.GameUtil;
-import com.sebastian.unobackend.player.PlayerRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -21,19 +22,18 @@ public class GameServiceImpl implements GameService {
 
    private final GameRepository gameRepository;
    private final CardRepository cardRepository;
-   private final PlayerRepository playerRepository;
+   private final GameDTOMapper gameDTOMapper;
 //   private Game game;
 
    @Autowired
-   public GameServiceImpl(GameRepository gameRepository, CardRepository cardRepository,
-                          PlayerRepository playerRepository) {
+   public GameServiceImpl(GameRepository gameRepository, CardRepository cardRepository, GameDTOMapper gameDTOMapper) {
       this.gameRepository = gameRepository;
       this.cardRepository = cardRepository;
-      this.playerRepository = playerRepository;
+      this.gameDTOMapper = gameDTOMapper;
    }
 
    @Override
-   public Game initialize(Long gameId) {
+   public GameDTO initialize(Long gameId) {
       Game game = gameRepository
            .findById(gameId)
            .orElseThrow(() -> new GameNotFoundException(gameId));
@@ -58,42 +58,38 @@ public class GameServiceImpl implements GameService {
 
       game.setCurrentColor(GameUtil.getLastCard(playedCards).getColor());
       game.setCurrentValue(GameUtil.getLastCard(playedCards).getValue());
-      return gameRepository.save(game);
+      return gameDTOMapper.apply(gameRepository.save(game));
    }
 
    @Override
-   public Game play(Long gameId, Long playerId, PlayDTO playDto) {
+   public GameDTO play(Long gameId, Long playerId, PlayDTO playDto) {
       Game game = gameRepository
            .findById(gameId)
            .orElseThrow(() -> new GameNotFoundException(gameId));
       // Verifies the game isn't over
-      if (game.getWinner() != null) return game;
+      if (game.getWinner() != null) return gameDTOMapper.apply(game);
 
       // Verifies the player is in the game
       GamePlayer gamePlayer = game.getPlayers().stream()
            .filter(gp -> gp.getPlayer().getId().equals(playerId))
            .findFirst()
-           .orElse(null);
-
-      if (gamePlayer == null) throw new PlayerNotFoundException(playerId);
+           .orElseThrow(() -> new PlayerNotFoundException(playerId));
 
       // Verifies if it's his turn
-      if (!(game.getTurn().equals(gamePlayer.getPlayer().getId()))) return game;
+      if (!(game.getTurn().equals(gamePlayer.getPlayer().getId()))) return gameDTOMapper.apply(game);
       // Verifies if he has the played card
       List<Card> playerCards = gamePlayer.getPlayerDeck();
       Card playedCard = playerCards.stream()
            .filter(c -> c.equals(playDto.card()))
            .findFirst()
            .orElse(null);
-      if (playedCard == null) return game;
+      if (playedCard == null) return gameDTOMapper.apply(game);
 
-      Card lastPlayedCard = GameUtil.getLastCard(game.getPlayedCards());
-
-      // Verifies playedCard has the same Color or Value of the lastPlayedCard
+      // Verifies playedCard has the same Color or Value of the last played card
       if (!(playedCard.getColor().equals(game.getCurrentColor()) ||
-           playedCard.getValue().equals(lastPlayedCard.getValue()) ||
+           playedCard.getValue().equals(game.getCurrentValue()) ||
            playedCard.getColor().equals(Card.Color.BLACK))) {
-         return game;
+         return gameDTOMapper.apply(game);
       }
 
       // Adds the playDto.card to playedCard and removes it from the player's deck
@@ -101,10 +97,12 @@ public class GameServiceImpl implements GameService {
       playerCards.remove(playedCard);
       // Sets currentColor to the lastPlayed's color
       game.setCurrentColor(playedCard.getColor());
+      // Sets currentValue to the lastPlayed's value
+      game.setCurrentValue(playedCard.getValue());
       // If the card was the last one of his/her deck, there is a winner and the game ends.
       if (playerCards.isEmpty()) {
          game.setWinner(gamePlayer.getPlayer().getId());
-         return gameRepository.save(game);
+         return gameDTOMapper.apply(gameRepository.save(game));
       }
 
       // Converts LinkedHashSet players to array because it's easier to work with indexes
@@ -147,17 +145,17 @@ public class GameServiceImpl implements GameService {
       Long newTurn = GameUtil.switchTurn(playersArr, currentTurnIndex, game.isReverse(), isSkip);
       game.setTurn(newTurn);
 
-      return gameRepository.save(game);
+      return gameDTOMapper.apply(gameRepository.save(game));
    }
 
    @Override
-   public Game drawCard(Long gameId, Long playerId) {
+   public GameDTO drawCard(Long gameId, Long playerId) {
 
       Game game = gameRepository
            .findById(gameId)
            .orElseThrow(() -> new GameNotFoundException(gameId));
       // Verifies the game isn't over
-      if (game.getWinner() != null) return game;
+      if (game.getWinner() != null) return gameDTOMapper.apply(game);
 
       // Verifies the player is in the game
       GamePlayer gamePlayer = game.getPlayers().stream()
@@ -167,7 +165,7 @@ public class GameServiceImpl implements GameService {
       if (gamePlayer == null) throw new PlayerNotFoundException(playerId);
 
       // Verifies if it's his turn
-      if (!(game.getTurn().equals(gamePlayer.getPlayer().getId()))) return game;
+      if (!(game.getTurn().equals(gamePlayer.getPlayer().getId()))) return gameDTOMapper.apply(game);
 
       game.deal(1, gamePlayer.getPlayerDeck());
       // TODO: Verificar si esto funciona bien
@@ -188,7 +186,7 @@ public class GameServiceImpl implements GameService {
       Long newTurn = GameUtil.switchTurn(playersArr, currentTurnIndex, game.isReverse(), false);
       game.setTurn(newTurn);
 
-      return gameRepository.save(game);
+      return gameDTOMapper.apply(gameRepository.save(game));
    }
 
 //   @Override
@@ -199,14 +197,19 @@ public class GameServiceImpl implements GameService {
 //   }
 
    @Override
-   public List<Game> findAll() {
-      return gameRepository.findAll();
+   public List<GameDTO> findAll() {
+      return gameRepository
+           .findAll()
+           .stream()
+           .map(gameDTOMapper)
+           .collect(Collectors.toList());
    }
 
    @Override
-   public Game findById(Long id) {
+   public GameDTO findById(Long id) {
       return gameRepository
            .findById(id)
+           .map(gameDTOMapper)
            .orElseThrow(() -> new GameNotFoundException(id));
    }
 

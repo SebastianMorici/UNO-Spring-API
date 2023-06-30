@@ -1,6 +1,7 @@
 package com.sebastian.unobackend.player;
 
-import com.sebastian.unobackend.game.Game;
+import com.sebastian.unobackend.game.GameDTO;
+import com.sebastian.unobackend.game.dto.GameDTO;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface PlayerService {
     Player update(Long id, Player updatedPlayer) throws PlayerNotFoundException;
     void delete(Long id) throws PlayerNotFoundException;
     Player login(Player loginPlayer) throws PlayerNotFoundException;
-    Game searchGame(Long playerId, SearchGameDTO searchGameDTO) throws PlayerNotFoundException;
+    GameDTO searchGame(Long playerId, SearchGameDTO searchGameDTO) throws PlayerNotFoundException;
 //    Long searchGame(Long playerId);
 
 }
