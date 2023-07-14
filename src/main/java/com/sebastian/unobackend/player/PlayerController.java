@@ -1,6 +1,7 @@
 package com.sebastian.unobackend.player;
 
 import com.sebastian.unobackend.game.dto.GameDTO;
+import com.sebastian.unobackend.player.dto.SearchGameDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,11 +46,6 @@ public class PlayerController {
         playerService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<Player> login(@RequestBody Player loginPlayer) {
-//        return ResponseEntity.status(HttpStatus.OK).body(playerService.login(loginPlayer));
-//    }
 
     @PostMapping("/{playerId}/search_game")
     public ResponseEntity<GameDTO> searchGame(@PathVariable Long playerId, @RequestBody SearchGameDTO searchGameDTO) {

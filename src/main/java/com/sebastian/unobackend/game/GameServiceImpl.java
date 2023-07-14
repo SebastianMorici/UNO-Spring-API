@@ -1,6 +1,6 @@
 package com.sebastian.unobackend.game;
 
-import com.sebastian.unobackend.association.GamePlayer;
+import com.sebastian.unobackend.gameplayer.GamePlayer;
 import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.card.CardRepository;
 import com.sebastian.unobackend.game.dto.GameDTO;

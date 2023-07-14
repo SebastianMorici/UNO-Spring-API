@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.player;
+package com.sebastian.unobackend.player.dto;
 
 public record SearchGameDTO(int numberOfPlayers) {
 }

@@ -1,6 +1,6 @@
 package com.sebastian.unobackend.game.dto;
 
-import com.sebastian.unobackend.association.GamePlayerDTOMapper;
+import com.sebastian.unobackend.gameplayer.dto.GamePlayerDTOMapper;
 import com.sebastian.unobackend.game.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

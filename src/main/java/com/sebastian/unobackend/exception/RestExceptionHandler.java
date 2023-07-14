@@ -1,6 +1,6 @@
 package com.sebastian.unobackend.exception;
 
-import com.sebastian.unobackend.association.GamePlayerNotFoundException;
+import com.sebastian.unobackend.gameplayer.GamePlayerNotFoundException;
 import com.sebastian.unobackend.player.PlayerNotFoundException;
 import com.sebastian.unobackend.game.GameNotFoundException;
 import com.sebastian.unobackend.game.GameNotInitializedException;

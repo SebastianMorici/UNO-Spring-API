@@ -1,5 +1,6 @@
-package com.sebastian.unobackend.association;
+package com.sebastian.unobackend.gameplayer.dto;
 
+import com.sebastian.unobackend.gameplayer.GamePlayer;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;

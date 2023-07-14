@@ -1,7 +1,6 @@
 package com.sebastian.unobackend.game;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sebastian.unobackend.association.GamePlayer;
+import com.sebastian.unobackend.gameplayer.GamePlayer;
 import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.player.Player;
 import jakarta.persistence.*;

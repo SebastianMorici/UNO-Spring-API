@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.auth;
+package com.sebastian.unobackend.auth.dto;
 
 public record LoginDTO(String username, String password) {
 }

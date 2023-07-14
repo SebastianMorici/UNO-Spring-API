@@ -1,8 +1,9 @@
 package com.sebastian.unobackend.auth;
 
-import com.sebastian.unobackend.player.Player;
+import com.sebastian.unobackend.auth.dto.LoginResponseDTO;
+import com.sebastian.unobackend.player.dto.PlayerDTO;
 
 public interface AuthenticationService {
-    Player registerPlayer(String firstname, String lastname, String username, String password);
+    PlayerDTO registerPlayer(String firstname, String lastname, String username, String password);
     LoginResponseDTO loginPlayer(String username, String password);
 }

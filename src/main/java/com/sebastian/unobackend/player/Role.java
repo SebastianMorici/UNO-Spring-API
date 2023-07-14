@@ -10,12 +10,13 @@ public class Role implements GrantedAuthority {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private String authority;
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
 
     public Role() {
     }
 
-    public Role(String authority) {
+    public Role(Authority authority) {
         this.authority = authority;
     }
 
@@ -29,10 +30,11 @@ public class Role implements GrantedAuthority {
 
     @Override
     public String getAuthority() {
-        return authority;
+        return authority.name();
     }
 
-    public void setAuthority(String authority) {
+    public void setAuthority(Authority authority) {
         this.authority = authority;
     }
+
 }

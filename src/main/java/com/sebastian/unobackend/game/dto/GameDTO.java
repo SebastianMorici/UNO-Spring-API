@@ -1,6 +1,6 @@
 package com.sebastian.unobackend.game.dto;
 
-import com.sebastian.unobackend.association.GamePlayerDTO;
+import com.sebastian.unobackend.gameplayer.dto.GamePlayerDTO;
 import com.sebastian.unobackend.card.Card;
 
 import java.util.List;

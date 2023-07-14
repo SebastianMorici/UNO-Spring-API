@@ -17,12 +17,9 @@ public class TokenServiceImpl implements TokenService {
 
     private final JwtEncoder jwtEncoder;
 
-    private final JwtDecoder jwtDecoder;
-
     @Autowired
-    public TokenServiceImpl(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder) {
+    public TokenServiceImpl(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
-        this.jwtDecoder = jwtDecoder;
     }
 
     @Override

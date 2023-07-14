@@ -1,9 +1,9 @@
 package com.sebastian.unobackend.auth;
 
-import com.sebastian.unobackend.player.Player;
-import com.sebastian.unobackend.player.PlayerRepository;
-import com.sebastian.unobackend.player.Role;
-import com.sebastian.unobackend.player.RoleRepository;
+import com.sebastian.unobackend.auth.dto.LoginResponseDTO;
+import com.sebastian.unobackend.player.*;
+import com.sebastian.unobackend.player.dto.PlayerDTO;
+import com.sebastian.unobackend.player.dto.PlayerDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,24 +22,28 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     private final PasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final PlayerDTOMapper playerDTOMapper;
 
     @Autowired
-    public AuthenticationServiceImpl(PlayerRepository playerRepository, RoleRepository roleRepository, PasswordEncoder encoder, AuthenticationManager authenticationManager, TokenService tokenService) {
+    public AuthenticationServiceImpl(PlayerRepository playerRepository, RoleRepository roleRepository, PasswordEncoder encoder, AuthenticationManager authenticationManager, TokenService tokenService, PlayerDTOMapper playerDTOMapper) {
         this.playerRepository = playerRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.playerDTOMapper = playerDTOMapper;
     }
 
     //Todo: Make registrationDTO
     @Override
-    public Player registerPlayer(String firstname, String lastname, String username, String password) {
+    public PlayerDTO registerPlayer(String firstname, String lastname, String username, String password) {
 
-        Role role = roleRepository.findByAuthority("USER").get();
+        Role role = roleRepository.findByAuthority(Authority.USER).get();
         Set<Role> authorities = new HashSet<>();
         authorities.add(role);
-        return playerRepository.save(new Player(firstname, lastname, username, encoder.encode(password), authorities));
+
+        Player registeredPlayer = new Player(firstname, lastname, username, encoder.encode(password), authorities);
+        return playerDTOMapper.apply(playerRepository.save(registeredPlayer));
     }
 
     @Override
@@ -48,6 +52,9 @@ public class AuthenticationServiceImpl implements AuthenticationService{
                 new UsernamePasswordAuthenticationToken(username, password)
         );
         String token = tokenService.generateToken(auth);
-        return new LoginResponseDTO(playerRepository.findByUsername(username).get(), token);
+        Player loginPlayer = playerRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new PlayerNotFoundException(username));
+        return new LoginResponseDTO(playerDTOMapper.apply(loginPlayer), token);
     }
 }

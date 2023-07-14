@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.association;
+package com.sebastian.unobackend.gameplayer;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

@@ -1,9 +1,6 @@
 package com.sebastian.unobackend;
 
-import com.sebastian.unobackend.player.Player;
-import com.sebastian.unobackend.player.PlayerRepository;
-import com.sebastian.unobackend.player.Role;
-import com.sebastian.unobackend.player.RoleRepository;
+import com.sebastian.unobackend.player.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,10 +20,10 @@ public class UnoBackendApplication {
    @Bean
    CommandLineRunner run(RoleRepository roleRepository, PlayerRepository playerRepository, PasswordEncoder encoder) {
       return args -> {
-         if(roleRepository.findByAuthority("ADMIN").isPresent()) return;
+         if(roleRepository.findByAuthority(Authority.ADMIN).isPresent()) return;
 
-         Role adminRole = roleRepository.save(new Role("ADMIN"));
-         roleRepository.save(new Role("USER"));
+         Role adminRole = roleRepository.save(new Role(Authority.ADMIN));
+         roleRepository.save(new Role(Authority.USER));
 
          Set<Role> authorities = new HashSet<>();
          authorities.add(adminRole);

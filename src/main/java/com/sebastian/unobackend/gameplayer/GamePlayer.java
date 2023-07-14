@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.association;
+package com.sebastian.unobackend.gameplayer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sebastian.unobackend.card.Card;
@@ -21,12 +21,10 @@ public class GamePlayer implements Serializable {
    @EmbeddedId
    private GamePlayerId id;
 
-   @JsonIgnore
    @ManyToOne(fetch = FetchType.LAZY)
    @MapsId("gameId")
    private Game game;
 
-   @JsonIgnore
    @ManyToOne(fetch = FetchType.LAZY)
    @MapsId("playerId")
    private Player player;

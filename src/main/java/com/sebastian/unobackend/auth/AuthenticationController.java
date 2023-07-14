@@ -1,6 +1,9 @@
 package com.sebastian.unobackend.auth;
 
-import com.sebastian.unobackend.player.Player;
+import com.sebastian.unobackend.auth.dto.LoginDTO;
+import com.sebastian.unobackend.auth.dto.LoginResponseDTO;
+import com.sebastian.unobackend.auth.dto.RegistrationDTO;
+import com.sebastian.unobackend.player.dto.PlayerDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Player> registerPlayer(@RequestBody RegistrationDTO dto) {
+    public ResponseEntity<PlayerDTO> registerPlayer(@RequestBody RegistrationDTO dto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authenticationService.registerPlayer(

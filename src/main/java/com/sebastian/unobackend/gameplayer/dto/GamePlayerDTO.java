@@ -1,4 +1,4 @@
-package com.sebastian.unobackend.association;
+package com.sebastian.unobackend.gameplayer.dto;
 
 import com.sebastian.unobackend.card.Card;
 

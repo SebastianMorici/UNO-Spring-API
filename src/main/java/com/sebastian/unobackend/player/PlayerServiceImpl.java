@@ -1,14 +1,14 @@
 package com.sebastian.unobackend.player;
 
-import com.sebastian.unobackend.association.*;
+import com.sebastian.unobackend.gameplayer.*;
 import com.sebastian.unobackend.game.Game;
 import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.GameDTOMapper;
 import com.sebastian.unobackend.game.GameRepository;
+import com.sebastian.unobackend.player.dto.SearchGameDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
