@@ -35,8 +35,8 @@ public class GamePlayer implements Serializable {
    @JoinTable(
         name = "player_deck",
         joinColumns = {
-             @JoinColumn(name = "gameplayer_game_id", referencedColumnName = "game_id"),
-             @JoinColumn(name = "gameplayer_player_id", referencedColumnName = "player_id")
+             @JoinColumn(name = "game_id", referencedColumnName = "game_id"),
+             @JoinColumn(name = "player_id", referencedColumnName = "player_id")
         },
         inverseJoinColumns = @JoinColumn(name = "card_id")
    )

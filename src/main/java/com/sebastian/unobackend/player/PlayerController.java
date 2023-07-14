@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1/players")
 public class PlayerController {
     private final PlayerService playerService;
 
@@ -18,39 +19,39 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @GetMapping("/players")
+    @GetMapping("/")
     public ResponseEntity<List<Player>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.findAll());
     }
 
-    @GetMapping("/players/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Player> findById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.findById(id));
     }
 
-    @PostMapping("/players")
+    @PostMapping("/")
     public ResponseEntity<Player> create(@Valid @RequestBody Player newPlayer) {
         return ResponseEntity.status(HttpStatus.CREATED).body(playerService.create(newPlayer));
     }
 
 
-    @PutMapping("/players/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Player> update(@PathVariable Long id, @RequestBody Player updatedPlayer) {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.update(id, updatedPlayer));
     }
 
-    @DeleteMapping("/players/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         playerService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/players/login")
-    public ResponseEntity<Player> login(@RequestBody Player loginPlayer) {
-        return ResponseEntity.status(HttpStatus.OK).body(playerService.login(loginPlayer));
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<Player> login(@RequestBody Player loginPlayer) {
+//        return ResponseEntity.status(HttpStatus.OK).body(playerService.login(loginPlayer));
+//    }
 
-    @PostMapping("/players/{playerId}/search_game")
+    @PostMapping("/{playerId}/search_game")
     public ResponseEntity<GameDTO> searchGame(@PathVariable Long playerId, @RequestBody SearchGameDTO searchGameDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.searchGame(playerId, searchGameDTO));
     }

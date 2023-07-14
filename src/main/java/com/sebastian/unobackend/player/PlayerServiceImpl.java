@@ -7,6 +7,9 @@ import com.sebastian.unobackend.game.dto.GameDTOMapper;
 import com.sebastian.unobackend.game.GameRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,18 +21,21 @@ public class PlayerServiceImpl implements PlayerService {
    private final GameRepository gameRepository;
    private final GamePlayerRepository gamePlayerRepository;
    private final GameDTOMapper gameDTOMapper;
+   private final PasswordEncoder encoder;
 
    @Autowired
    public PlayerServiceImpl(
         PlayerRepository playerRepository,
         GameRepository gameRepository,
         GamePlayerRepository gamePlayerRepository,
-        GameDTOMapper gameDTOMapper
+        GameDTOMapper gameDTOMapper,
+        PasswordEncoder encoder
    ) {
       this.playerRepository = playerRepository;
       this.gameRepository = gameRepository;
       this.gamePlayerRepository = gamePlayerRepository;
       this.gameDTOMapper = gameDTOMapper;
+      this.encoder = encoder;
    }
 
    @Override
@@ -66,12 +72,12 @@ public class PlayerServiceImpl implements PlayerService {
       playerRepository.delete(player);
    }
 
-   @Override
-   public Player login(Player loginPlayer) {
-      return playerRepository
-           .findByName(loginPlayer.getName())
-           .orElseThrow(() -> new PlayerNotFoundException(loginPlayer.getName()));
-   }
+//   @Override
+//   public Player login(Player loginPlayer) {
+//      return playerRepository
+//           .findByName(loginPlayer.getFirstname())
+//           .orElseThrow(() -> new PlayerNotFoundException(loginPlayer.getFirstname()));
+//   }
 
    public GameDTO searchGame(Long playerId, SearchGameDTO searchGameDTO) {
       Player player = playerRepository
@@ -108,6 +114,12 @@ public class PlayerServiceImpl implements PlayerService {
    }
 
 
+   @Override
+   public UserDetails loadUserByUsername(String username) throws PlayerNotFoundException {
+      return playerRepository
+              .findByUsername(username)
+              .orElseThrow(() -> new PlayerNotFoundException(username));
+   }
 }
 //   public Game searchGameOLD(Long playerId) {
 //      Player player = playerRepository

@@ -6,7 +6,7 @@ public class PlayerNotFoundException extends RuntimeException {
         super("Player with id: " + id + " not found");
     }
 
-    public PlayerNotFoundException(String name) {
-        super("Player with name: '" + name + "' not found");
+    public PlayerNotFoundException(String username) {
+        super("Player with username: '" + username + "' not found");
     }
 }

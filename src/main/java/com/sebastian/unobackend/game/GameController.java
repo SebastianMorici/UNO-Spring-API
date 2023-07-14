@@ -12,6 +12,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
+@RequestMapping("/api/v1/games")
 public class GameController {
 
     private final GameService gameService;
@@ -22,17 +23,17 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    @GetMapping("/uno_tables")
+    @GetMapping("/")
     public ResponseEntity<List<GameDTO>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.findAll());
     }
 
-    @GetMapping("/uno_tables/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<GameDTO> findById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.findById(id));
     }
 
-    @PostMapping("/uno_tables/{id}/initialize")
+    @PostMapping("/{id}/initialize")
     public ResponseEntity<GameDTO> initialize(@PathVariable Long id) {
         try {
             lock.lock();
@@ -42,18 +43,18 @@ public class GameController {
         }
     }
 
-    @DeleteMapping("/uno_tables/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         gameService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/uno_tables/{id}/players/{playerId}/play")
+    @PostMapping("/{id}/players/{playerId}/play")
     public ResponseEntity<GameDTO> play(@PathVariable Long id, @PathVariable Long playerId, @RequestBody PlayDTO playDto) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.play(id, playerId, playDto));
     }
 
-    @GetMapping("/uno_tables/{id}/players/{playerId}/draw")
+    @GetMapping("/{id}/players/{playerId}/draw")
     public ResponseEntity<GameDTO> drawCard(@PathVariable Long id, @PathVariable Long playerId) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.drawCard(id, playerId));
     }
