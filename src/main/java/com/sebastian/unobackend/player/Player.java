@@ -2,7 +2,11 @@ package com.sebastian.unobackend.player;
 
 import com.sebastian.unobackend.gameplayer.GamePlayer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Columns;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,29 +19,17 @@ public class Player implements UserDetails {
     @Column(name = "id", nullable = false)
     private Long id;
 
-//    @NotNull(message = "firstname is required")
-    @Size(min = 2, max = 30, message = "firstname's length must be between 2 and 30")
+    @Column(nullable = false)
     private String firstname;
 
-//    @NotNull(message = "lastname is required")
-    @Size(min = 2, max = 30, message = "lastname's length must be between 2 and 30")
+    @Column(nullable = false)
     private String lastname;
 
-//    @NotNull(message = "email is required")
-    @Size(min = 2, max = 30, message = "email's length must be between 2 and 30")
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-//    @NotNull(message = "password is required")
+    @Column(nullable = false)
     private String password;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_role",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "role_id") }
-    )
-    private Set<Role> authorities;
 
     private boolean isAccountNonExpired = true;
 
@@ -47,8 +39,14 @@ public class Player implements UserDetails {
 
     private boolean isEnabled = true;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "role_id") }
+    )
+    private Set<Role> authorities;
 
-    // Associations
     @OneToMany(
             mappedBy = "player",
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE},
@@ -147,6 +145,7 @@ public class Player implements UserDetails {
         this.games = games;
     }
 
+    // Constructors
     public Player() {
     }
 

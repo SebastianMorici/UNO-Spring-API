@@ -1,4 +1,6 @@
 package com.sebastian.unobackend.auth.dto;
 
-public record LoginDTO(String username, String password) {
+import jakarta.validation.constraints.NotNull;
+
+public record LoginDTO(@NotNull String username, @NotNull String password) {
 }

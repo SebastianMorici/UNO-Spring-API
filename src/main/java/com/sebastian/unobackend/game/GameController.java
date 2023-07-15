@@ -2,6 +2,7 @@ package com.sebastian.unobackend.game;
 
 import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.PlayDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class GameController {
     }
 
     @PostMapping("/{id}/players/{playerId}/play")
-    public ResponseEntity<GameDTO> play(@PathVariable Long id, @PathVariable Long playerId, @RequestBody PlayDTO playDto) {
+    public ResponseEntity<GameDTO> play(@PathVariable Long id, @PathVariable Long playerId, @Valid @RequestBody PlayDTO playDto) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.play(id, playerId, playDto));
     }
 

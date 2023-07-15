@@ -45,7 +45,6 @@ public class JwtSecurityConfiguration {
                     requests.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);

@@ -1,9 +1,11 @@
 package com.sebastian.unobackend.game;
 
-import com.sebastian.unobackend.gameplayer.GamePlayer;
 import com.sebastian.unobackend.card.Card;
+import com.sebastian.unobackend.gameplayer.GamePlayer;
 import com.sebastian.unobackend.player.Player;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +22,7 @@ public class Game implements Serializable {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @Column(name = "id", nullable = false)
    private Long id;
+   @Min(2) @Max(10)
    private int numberOfPlayers;
    private boolean isFull = false;
    private Long turn;
@@ -29,7 +32,6 @@ public class Game implements Serializable {
    private boolean reverse = false;
 
    // Associations
-//   @JsonIgnore
    @ManyToMany
    @JoinTable(name = "main_deck",
         joinColumns = @JoinColumn(name = "game_id"),

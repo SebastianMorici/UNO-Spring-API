@@ -30,12 +30,6 @@ public class PlayerController {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.findById(id));
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Player> create(@Valid @RequestBody Player newPlayer) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(playerService.create(newPlayer));
-    }
-
-
     @PutMapping("/{id}")
     public ResponseEntity<Player> update(@PathVariable Long id, @RequestBody Player updatedPlayer) {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.update(id, updatedPlayer));
@@ -48,7 +42,7 @@ public class PlayerController {
     }
 
     @PostMapping("/{playerId}/search_game")
-    public ResponseEntity<GameDTO> searchGame(@PathVariable Long playerId, @RequestBody SearchGameDTO searchGameDTO) {
+    public ResponseEntity<GameDTO> searchGame(@PathVariable Long playerId, @Valid @RequestBody SearchGameDTO searchGameDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.searchGame(playerId, searchGameDTO));
     }
 

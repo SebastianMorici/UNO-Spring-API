@@ -4,6 +4,7 @@ import com.sebastian.unobackend.auth.dto.LoginDTO;
 import com.sebastian.unobackend.auth.dto.LoginResponseDTO;
 import com.sebastian.unobackend.auth.dto.RegistrationDTO;
 import com.sebastian.unobackend.player.dto.PlayerDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<PlayerDTO> registerPlayer(@RequestBody RegistrationDTO dto) {
+    public ResponseEntity<PlayerDTO> registerPlayer(@Valid @RequestBody RegistrationDTO dto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authenticationService.registerPlayer(
@@ -36,7 +37,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> loginPlayer(@RequestBody LoginDTO dto) {
+    public ResponseEntity<LoginResponseDTO> loginPlayer(@Valid @RequestBody LoginDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.loginPlayer(dto.username(), dto.password()));
     }
 }
