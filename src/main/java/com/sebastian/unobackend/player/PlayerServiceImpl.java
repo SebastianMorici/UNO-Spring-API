@@ -1,15 +1,16 @@
 package com.sebastian.unobackend.player;
 
-import com.sebastian.unobackend.gameplayer.*;
 import com.sebastian.unobackend.game.Game;
+import com.sebastian.unobackend.game.GameRepository;
+import com.sebastian.unobackend.game.GameService;
 import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.GameDTOMapper;
-import com.sebastian.unobackend.game.GameRepository;
+import com.sebastian.unobackend.gameplayer.GamePlayer;
+import com.sebastian.unobackend.gameplayer.GamePlayerRepository;
 import com.sebastian.unobackend.player.dto.SearchGameDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class PlayerServiceImpl implements PlayerService {
    private final GameRepository gameRepository;
    private final GamePlayerRepository gamePlayerRepository;
    private final GameDTOMapper gameDTOMapper;
-   private final PasswordEncoder encoder;
+   private final GameService gameService;
 
    @Autowired
    public PlayerServiceImpl(
@@ -29,13 +30,13 @@ public class PlayerServiceImpl implements PlayerService {
         GameRepository gameRepository,
         GamePlayerRepository gamePlayerRepository,
         GameDTOMapper gameDTOMapper,
-        PasswordEncoder encoder
+        GameService gameService
    ) {
       this.playerRepository = playerRepository;
       this.gameRepository = gameRepository;
       this.gamePlayerRepository = gamePlayerRepository;
       this.gameDTOMapper = gameDTOMapper;
-      this.encoder = encoder;
+      this.gameService = gameService;
    }
 
    @Override
@@ -72,13 +73,6 @@ public class PlayerServiceImpl implements PlayerService {
       playerRepository.delete(player);
    }
 
-//   @Override
-//   public Player login(Player loginPlayer) {
-//      return playerRepository
-//           .findByName(loginPlayer.getFirstname())
-//           .orElseThrow(() -> new PlayerNotFoundException(loginPlayer.getFirstname()));
-//   }
-
    public GameDTO searchGame(Long playerId, SearchGameDTO searchGameDTO) {
       Player player = playerRepository
            .findById(playerId)
@@ -87,18 +81,8 @@ public class PlayerServiceImpl implements PlayerService {
       List<Game> nonFullGames = gameRepository.findByIsFull(false);
       // Creates a new game and adds the first player
       if (nonFullGames.isEmpty()) {
-         Game newGame = new Game();
-         newGame.setNumberOfPlayers(searchGameDTO.numberOfPlayers());
-         Game savedGame = gameRepository.save(newGame);
-         savedGame.addPlayer(player);
-         GamePlayer gamePlayer = savedGame.getPlayers().stream()
-              .filter(gp -> gp.getPlayer().getId().equals(playerId))
-              .findFirst()
-              .orElseThrow(() -> new GamePlayerNotFoundException(savedGame.getId(), playerId));
-         gamePlayerRepository.save(gamePlayer);
-         playerRepository.save(player);
-
-         return gameDTOMapper.apply(gameRepository.save(savedGame));
+         Game newGame = gameService.createGame(searchGameDTO.numberOfPlayers(), player);
+         return gameDTOMapper.apply(gameRepository.save(newGame));
       }
       // Filters the games that matches the numberOfPlayers argument
       List<Game> gamesToJoin = nonFullGames.stream()
@@ -107,9 +91,13 @@ public class PlayerServiceImpl implements PlayerService {
       // game is the last of gamesToJoin
       Game game = gamesToJoin.get(gamesToJoin.size() - 1);
       // Adds the new player to the game
+      if (game.getPlayers().stream().anyMatch(gp -> gp.getPlayer().equals(player))) return gameDTOMapper.apply(game);
       game.addPlayer(player);
       playerRepository.save(player);
-      if (game.getPlayers().size() == game.getNumberOfPlayers()) game.setFull(true);
+      if (game.getPlayers().size() == game.getNumberOfPlayers()) {
+         game.setFull(true);
+         gameService.initialize(game.getId());
+      }
       return gameDTOMapper.apply(gameRepository.save(game));
    }
 
@@ -117,34 +105,9 @@ public class PlayerServiceImpl implements PlayerService {
    @Override
    public UserDetails loadUserByUsername(String username) throws PlayerNotFoundException {
       return playerRepository
-              .findByUsername(username)
-              .orElseThrow(() -> new PlayerNotFoundException(username));
+           .findByUsername(username)
+           .orElseThrow(() -> new PlayerNotFoundException(username));
    }
+
 }
-//   public Game searchGameOLD(Long playerId) {
-//      Player player = playerRepository
-//           .findById(playerId)
-//           .orElseThrow(() -> new PlayerNotFoundException(playerId));
-//
-//      List<Game> nonFullGames = gameRepository.findByIsFull(false);
-//      // Creates a new Game and set playerOne
-//      if (nonFullGames.isEmpty()) {
-//         Game newGame = new Game();
-//         newGame.setPlayerOne(player);
-//         return gameRepository.save(newGame);
-//      }
-//      // game is the last of nonFullGames
-//      Game game = nonFullGames.get(nonFullGames.size() - 1);
-//      // Set playerTwo
-//      if (game.getPlayerTwo() == null) {
-//         game.setPlayerTwo(player);
-//         return gameRepository.save(game);
-//      }
-//      // Set playerThree
-//      game.setPlayerThree(player);
-//      // isFull = true
-//      game.setFull(true);
-//
-//      return gameRepository.save(game);
-//   }
 

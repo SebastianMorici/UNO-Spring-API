@@ -6,8 +6,11 @@ import com.sebastian.unobackend.card.CardRepository;
 import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.GameDTOMapper;
 import com.sebastian.unobackend.game.dto.PlayDTO;
+import com.sebastian.unobackend.gameplayer.GamePlayerRepository;
+import com.sebastian.unobackend.player.Player;
 import com.sebastian.unobackend.player.PlayerNotFoundException;
 import com.sebastian.unobackend.game.util.GameUtil;
+import com.sebastian.unobackend.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +26,35 @@ public class GameServiceImpl implements GameService {
    private final GameRepository gameRepository;
    private final CardRepository cardRepository;
    private final GameDTOMapper gameDTOMapper;
-//   private Game game;
+   private final GamePlayerRepository gamePlayerRepository;
+   private final PlayerRepository playerRepository;
 
    @Autowired
-   public GameServiceImpl(GameRepository gameRepository, CardRepository cardRepository, GameDTOMapper gameDTOMapper) {
+   public GameServiceImpl(
+        GameRepository gameRepository,
+        CardRepository cardRepository,
+        GameDTOMapper gameDTOMapper,
+        GamePlayerRepository gamePlayerRepository,
+        PlayerRepository playerRepository
+   ) {
       this.gameRepository = gameRepository;
       this.cardRepository = cardRepository;
       this.gameDTOMapper = gameDTOMapper;
+      this.gamePlayerRepository = gamePlayerRepository;
+      this.playerRepository = playerRepository;
+   }
+
+
+   @Override
+   public Game createGame(int numberOfPlayers, Player player) {
+      Game newGame = new Game();
+      newGame.setNumberOfPlayers(numberOfPlayers);
+      Game savedGame = gameRepository.save(newGame);
+      savedGame.addPlayer(player);
+      GamePlayer gamePlayer = savedGame.getPlayers().stream().findFirst().get();
+      gamePlayerRepository.save(gamePlayer);
+      playerRepository.save(player);
+      return savedGame;
    }
 
    @Override
@@ -47,7 +72,7 @@ public class GameServiceImpl implements GameService {
       // Shuffles deck
       game.shuffleDeck();
       // Deals seven cards to each player
-      for(GamePlayer gamePlayer : game.getPlayers()){
+      for (GamePlayer gamePlayer : game.getPlayers()) {
          game.deal(7, gamePlayer.getPlayerDeck());
       }
       // Deals one card to playedCards

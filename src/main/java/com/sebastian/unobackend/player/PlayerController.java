@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +21,8 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @GetMapping("/")
+    @GetMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Player>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.findAll());
     }
@@ -36,12 +38,14 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         playerService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/{playerId}/search_game")
+    @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
     public ResponseEntity<GameDTO> searchGame(@PathVariable Long playerId, @Valid @RequestBody SearchGameDTO searchGameDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.searchGame(playerId, searchGameDTO));
     }

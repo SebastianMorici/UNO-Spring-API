@@ -2,11 +2,15 @@ package com.sebastian.unobackend.game;
 
 import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.PlayDTO;
+import com.sebastian.unobackend.player.Player;
 import com.sebastian.unobackend.player.PlayerNotFoundException;
 
 import java.util.List;
 
 public interface GameService {
+
+   Game createGame(int numberOfPlayers, Player player);
+
    List<GameDTO> findAll();
 
    GameDTO findById(Long id) throws GameNotFoundException;
