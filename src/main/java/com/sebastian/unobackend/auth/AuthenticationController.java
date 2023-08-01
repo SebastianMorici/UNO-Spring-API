@@ -4,6 +4,7 @@ import com.sebastian.unobackend.auth.dto.LoginDTO;
 import com.sebastian.unobackend.auth.dto.LoginResponseDTO;
 import com.sebastian.unobackend.auth.dto.RegistrationDTO;
 import com.sebastian.unobackend.player.dto.PlayerDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
