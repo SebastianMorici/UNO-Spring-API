@@ -2,6 +2,7 @@ package com.sebastian.unobackend.game;
 
 import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.PlayDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
 @RequestMapping("/api/v1/games")
+@SecurityRequirement(name = "bearerAuth")
 public class GameController {
 
     private final GameService gameService;
