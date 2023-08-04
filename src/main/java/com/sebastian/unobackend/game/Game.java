@@ -30,6 +30,7 @@ public class Game implements Serializable {
    private Card.Color currentColor;
    private Card.Value currentValue;
    private boolean reverse = false;
+   private boolean skip = false;
 
    // Associations
    @ManyToMany
