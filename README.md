@@ -25,8 +25,6 @@ This project consists in a REST API for the popular card game "UNO", enabling pl
 ## Getting Started
 To get started with this project, you will need to have the following installed on your local machine:
 
-* JDK 17+
-* Maven 3+
 * Docker
 
 
