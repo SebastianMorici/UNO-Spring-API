@@ -54,20 +54,4 @@ public class GameController {
       return ResponseEntity.status(HttpStatus.OK).body(gameService.drawCard(id, playerId));
    }
 
-
 }
-//    @GetMapping("/{id}/refresh")
-//    public ResponseEntity<Game> refresh(@PathVariable Long id) {
-//        return ResponseEntity.status(HttpStatus.OK).body(gameService.refresh(id));
-//    }
-
-//    @PostMapping("/{id}/changed")
-//    public ResponseEntity<String> changed(@PathVariable Long id, @RequestBody ChangedRequestData requestData) {
-//        return ResponseEntity.status(HttpStatus.OK).body("{ \"changed\": \"" + gameService.changed(id, requestData.getDecksSize()) + "\" }" );
-//    }
-
-//    @PostMapping("/{id}/clear")
-//    public ResponseEntity<Void> clear(@PathVariable Long id) {
-//        gameService.clearGame(id);
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//    }

@@ -5,11 +5,10 @@ import com.sebastian.unobackend.card.CardRepository;
 import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.GameDTOMapper;
 import com.sebastian.unobackend.game.dto.PlayDTO;
-import com.sebastian.unobackend.game.util.GameUtil;
 import com.sebastian.unobackend.gameplayer.GamePlayer;
+import com.sebastian.unobackend.gameplayer.GamePlayerNotFoundException;
 import com.sebastian.unobackend.gameplayer.GamePlayerRepository;
 import com.sebastian.unobackend.player.Player;
-import com.sebastian.unobackend.player.PlayerNotFoundException;
 import com.sebastian.unobackend.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,22 +66,24 @@ public class GameServiceImpl implements GameService {
       ArrayList<GamePlayer> auxPlayersList = new ArrayList<>(game.getPlayers());
       Collections.shuffle(auxPlayersList);
       game.setTurn(auxPlayersList.get(0).getPlayer().getId());
-      // Sets deck
+
       game.setDeck(cardRepository.findAll());
-      // Shuffles deck
+
       game.shuffleDeck();
-      // Deals seven cards to each player
+
       for (GamePlayer gamePlayer : game.getPlayers()) {
          game.deal(7, gamePlayer.getPlayerDeck());
       }
-      // Deals one card to playedCards
+
       List<Card> playedCards = game.getPlayedCards();
+      Card lastPlayedCard;
       do {
          game.deal(1, playedCards);
-      } while (GameUtil.getLastCard(playedCards).getColor() == Card.Color.BLACK);
+         lastPlayedCard = playedCards.get(playedCards.size() - 1);
+      } while (lastPlayedCard.getColor() == Card.Color.BLACK);
 
-      game.setCurrentColor(GameUtil.getLastCard(playedCards).getColor());
-      game.setCurrentValue(GameUtil.getLastCard(playedCards).getValue());
+      game.setCurrentColor(lastPlayedCard.getColor());
+      game.setCurrentValue(lastPlayedCard.getValue());
       return gameDTOMapper.apply(gameRepository.save(game));
    }
 
@@ -92,61 +93,50 @@ public class GameServiceImpl implements GameService {
            .findById(gameId)
            .orElseThrow(() -> new GameNotFoundException(gameId));
 
+      if (!game.isFull()) throw new GameNotInitializedException(gameId);
+
       if (game.getWinner() != null) return gameDTOMapper.apply(game);
 
       GamePlayer gamePlayer = game.getPlayers().stream()
            .filter(gp -> gp.getPlayer().getId().equals(playerId))
            .findFirst()
-           .orElseThrow(() -> new PlayerNotFoundException(playerId));
+           .orElseThrow(() -> new GamePlayerNotFoundException(gameId, playerId));
 
-      if (!isPlayerTurn(game, gamePlayer)) return gameDTOMapper.apply(game);
+      if (notPlayerTurn(game, gamePlayer)) return gameDTOMapper.apply(game);
 
-      // playedCardToPlayedCards method returns false if something's wrong
       if (!playedCardToPlayedCards(gamePlayer, game, playDto.card())) return gameDTOMapper.apply(game);
 
-      // If the card was the last one, there is a winner and the game ends.
       if (gamePlayer.getPlayerDeck().isEmpty()) {
          game.setWinner(gamePlayer.getPlayer().getId());
          return gameDTOMapper.apply(gameRepository.save(game));
       }
 
-      // Converts LinkedHashSet players to array because it's easier to work with indexes
-      GamePlayer[] playersArr = game.getPlayers().toArray(GamePlayer[]::new);
-      int currentTurnIndex = IntStream.range(0, playersArr.length)
-           .filter(i -> game.getTurn().equals(playersArr[i].getPlayer().getId()))
-           .findFirst()
-           .orElse(-1);
+      applySpecialCardEffect(game, playDto);
 
-      // Effect of the special cards (SKIP, REVERSE, DRAW_TWO, WILD, WILD_DRAW_FOUR)
-      applySpecialCardEffect(game, playDto, playersArr, currentTurnIndex);
-
-      // Sets new Turn based on the last played card
-      game.setTurn(GameUtil.switchTurn(playersArr, currentTurnIndex, game.isReverse(), game.isSkip()));
+      game.setTurn(switchTurn(game));
 
       return gameDTOMapper.apply(gameRepository.save(game));
    }
 
    @Override
    public GameDTO drawCard(Long gameId, Long playerId) {
-
       Game game = gameRepository
            .findById(gameId)
            .orElseThrow(() -> new GameNotFoundException(gameId));
-      // Verifies the game isn't over
+
+      if (!game.isFull()) throw new GameNotInitializedException(gameId);
+
       if (game.getWinner() != null) return gameDTOMapper.apply(game);
 
-      // Verifies the player is in the game
       GamePlayer gamePlayer = game.getPlayers().stream()
            .filter(gp -> gp.getPlayer().getId().equals(playerId))
            .findFirst()
-           .orElse(null);
-      if (gamePlayer == null) throw new PlayerNotFoundException(playerId);
+           .orElseThrow(() -> new GamePlayerNotFoundException(gameId, playerId));
 
-      // Verifies if it's his turn
-      if (!(game.getTurn().equals(gamePlayer.getPlayer().getId()))) return gameDTOMapper.apply(game);
+      if (notPlayerTurn(game, gamePlayer)) return gameDTOMapper.apply(game);
 
       game.deal(1, gamePlayer.getPlayerDeck());
-      // TODO: Check if this works
+
       // If deck has only one card left, collects all the cards from the playedCards and adds them to deck
       if (game.getDeck().size() <= 1) {
          List<Card> cardsFromPlayedCards = game.getPlayedCards().subList(0, game.getPlayedCards().size() - 1);
@@ -154,15 +144,7 @@ public class GameServiceImpl implements GameService {
          game.shuffleDeck();
       }
 
-      // Converts LinkedHashSet players to array because it's easier to work with indexes
-      GamePlayer[] playersArr = game.getPlayers().toArray(GamePlayer[]::new);
-      int currentTurnIndex = IntStream.range(0, playersArr.length)
-           .filter(i -> game.getTurn().equals(playersArr[i].getPlayer().getId()))
-           .findFirst()
-           .orElse(-1);
-
-      Long newTurn = GameUtil.switchTurn(playersArr, currentTurnIndex, game.isReverse(), false);
-      game.setTurn(newTurn);
+      game.setTurn(switchTurn(game));
 
       return gameDTOMapper.apply(gameRepository.save(game));
    }
@@ -194,8 +176,8 @@ public class GameServiceImpl implements GameService {
    }
 
    // PRIVATE METHODS
-   private boolean isPlayerTurn(Game game, GamePlayer gamePlayer) {
-      return game.getTurn().equals(gamePlayer.getPlayer().getId());
+   private boolean notPlayerTurn(Game game, GamePlayer gamePlayer) {
+      return !game.getTurn().equals(gamePlayer.getPlayer().getId());
    }
 
    private boolean playedCardToPlayedCards(GamePlayer gamePlayer, Game game, Card cardDTO) {
@@ -205,6 +187,7 @@ public class GameServiceImpl implements GameService {
            .filter(c -> c.equals(cardDTO))
            .findFirst()
            .orElse(null);
+
       if (playedCard == null) return false;
 
       // Verifies playedCard has the same Color or Value of the last played card
@@ -225,7 +208,7 @@ public class GameServiceImpl implements GameService {
       return true;
    }
 
-   private void applySpecialCardEffect(Game game, PlayDTO playDto, GamePlayer[] players, int currentTurnIndex) {
+   private void applySpecialCardEffect(Game game, PlayDTO playDto) {
       game.setSkip(false);
       switch (playDto.card().getValue()) {
          case SKIP -> {
@@ -237,7 +220,7 @@ public class GameServiceImpl implements GameService {
             break;
          }
          case DRAW_TWO -> {
-            List<Card> nextPlayerDeck = GameUtil.getNextPlayerDeck(players, currentTurnIndex, game.isReverse());
+            List<Card> nextPlayerDeck = getNextPlayerDeck(game);
             game.deal(2, nextPlayerDeck);
             break;
          }
@@ -247,7 +230,7 @@ public class GameServiceImpl implements GameService {
          }
          case WILD_DRAW_FOUR -> {
             game.setCurrentColor(playDto.color());
-            List<Card> nextPlayerDeck = GameUtil.getNextPlayerDeck(players, currentTurnIndex, game.isReverse());
+            List<Card> nextPlayerDeck = getNextPlayerDeck(game);
             game.deal(4, nextPlayerDeck);
             break;
          }
@@ -255,17 +238,44 @@ public class GameServiceImpl implements GameService {
 
    }
 
-}
-//   public Game refresh(Long id) {
-//      if (game != null && game.getId().equals(id)) return game;
-//      return gameRepository
-//           .findById(id)
-//           .orElseThrow(() -> new GameNotFoundException(id));
-//   }
+   private Long switchTurn(Game game) {
+      int newTurnIndex;
 
-//   @Override
-//   public boolean changed(Long gameId, int[] decksSize) {
-//      return (decksSize[0] != game.getPlayerOne().getDeck().size()) ||
-//           (decksSize[1] != game.getPlayerTwo().getDeck().size()) ||
-//           (decksSize[2] != game.getPlayerThree().getDeck().size());
-//   }
+      GamePlayer[] playersArr = game.getPlayers().toArray(GamePlayer[]::new);
+      int currentTurnIndex = IntStream.range(0, playersArr.length)
+           .filter(i -> game.getTurn().equals(playersArr[i].getPlayer().getId()))
+           .findFirst()
+           .orElse(-1);
+
+      if (game.isReverse()) {
+         newTurnIndex = (currentTurnIndex + playersArr.length - 1) % playersArr.length;
+
+         if (game.isSkip()) newTurnIndex = (newTurnIndex + playersArr.length - 1) % playersArr.length;
+      } else {
+         newTurnIndex = (currentTurnIndex + 1) % playersArr.length;
+
+         if (game.isSkip()) newTurnIndex = (newTurnIndex + 1) % playersArr.length;
+      }
+
+      return playersArr[newTurnIndex].getPlayer().getId();
+   }
+
+   private List<Card> getNextPlayerDeck(Game game) {
+      int newTurnIndex;
+
+      GamePlayer[] playersArr = game.getPlayers().toArray(GamePlayer[]::new);
+      int currentTurnIndex = IntStream.range(0, playersArr.length)
+           .filter(i -> game.getTurn().equals(playersArr[i].getPlayer().getId()))
+           .findFirst()
+           .orElse(-1);
+
+      if (game.isReverse()) {
+         newTurnIndex = (currentTurnIndex + playersArr.length - 1) % playersArr.length;
+
+      } else {
+         newTurnIndex = (currentTurnIndex + 1) % playersArr.length;
+
+      }
+      return playersArr[newTurnIndex].getPlayerDeck();
+   }
+}

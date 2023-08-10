@@ -1,15 +1,31 @@
+#------------------------ LOCAL DATABASE CONFIG -------------------
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/uno_db
+#    username: sebastian
+#    password: password
+##    driver-class-name: org.postgresql.Driver
+#  jpa:
+##    database-platform: org.hibernate.dialect.PostgreSQLDialect
+##    show-sql: true
+##    properties:
+##      hibernate:
+##        format_sql: true
+#    hibernate:
+#      ddl-auto: create-drop
+#  output:
+#    ansi:
+#      enabled: always
+
+
+
+#------------------------- DOCKER DATABASE CONFIG ----------------
 spring:
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
-#    driver-class-name: org.postgresql.Driver
   jpa:
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
     hibernate:
       ddl-auto: create
   output:
@@ -17,10 +33,7 @@ spring:
       enabled: always
 
 
-
-
-
-
+#-------------------- H2 DATABASE CONFIG ------------------------
 #spring:
 #  datasource:
 #    url: jdbc:h2:file:~/Documents/H2_Databases/uno_app/uno_db

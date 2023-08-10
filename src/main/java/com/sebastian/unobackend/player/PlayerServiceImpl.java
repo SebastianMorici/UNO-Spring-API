@@ -79,19 +79,19 @@ public class PlayerServiceImpl implements PlayerService {
            .orElseThrow(() -> new PlayerNotFoundException(playerId));
 
       List<Game> nonFullGames = gameRepository.findByIsFull(false);
-      // Creates a new game and adds the first player
       if (nonFullGames.isEmpty()) {
          Game newGame = gameService.createGame(searchGameDTO.numberOfPlayers(), player);
          return gameDTOMapper.apply(gameRepository.save(newGame));
       }
-      // Filters the games that matches the numberOfPlayers argument
+
       List<Game> gamesToJoin = nonFullGames.stream()
            .filter(game -> game.getNumberOfPlayers() == searchGameDTO.numberOfPlayers())
            .toList();
-      // game is the last of gamesToJoin
+
       Game game = gamesToJoin.get(gamesToJoin.size() - 1);
-      // Adds the new player to the game
+
       if (game.getPlayers().stream().anyMatch(gp -> gp.getPlayer().equals(player))) return gameDTOMapper.apply(game);
+
       game.addPlayer(player);
       playerRepository.save(player);
       if (game.getPlayers().size() == game.getNumberOfPlayers()) {
