@@ -6,6 +6,7 @@ import com.sebastian.unobackend.game.dto.GameDTO;
 import com.sebastian.unobackend.game.dto.GameDTOMapper;
 import com.sebastian.unobackend.game.dto.PlayDTO;
 import com.sebastian.unobackend.gameplayer.GamePlayer;
+import com.sebastian.unobackend.gameplayer.GamePlayerCard;
 import com.sebastian.unobackend.gameplayer.GamePlayerNotFoundException;
 import com.sebastian.unobackend.gameplayer.GamePlayerRepository;
 import com.sebastian.unobackend.player.Player;
@@ -72,7 +73,7 @@ public class GameServiceImpl implements GameService {
       game.shuffleDeck();
 
       for (GamePlayer gamePlayer : game.getPlayers()) {
-         game.deal(7, gamePlayer.getPlayerDeck());
+         game.deal(7, gamePlayer);
       }
 
       List<Card> playedCards = game.getPlayedCards();
@@ -135,7 +136,7 @@ public class GameServiceImpl implements GameService {
 
       if (notPlayerTurn(game, gamePlayer)) return gameDTOMapper.apply(game);
 
-      game.deal(1, gamePlayer.getPlayerDeck());
+      game.deal(1, gamePlayer);
 
       // If deck has only one card left, collects all the cards from the playedCards and adds them to deck
       if (game.getDeck().size() <= 1) {
@@ -182,13 +183,14 @@ public class GameServiceImpl implements GameService {
 
    private boolean playedCardToPlayedCards(GamePlayer gamePlayer, Game game, Card cardDTO) {
 
-      List<Card> playerCards = gamePlayer.getPlayerDeck();
-      Card playedCard = playerCards.stream()
-           .filter(c -> c.equals(cardDTO))
+      List<GamePlayerCard> playerCards = gamePlayer.getPlayerDeck();
+      GamePlayerCard gamePlayerCard = playerCards.stream()
+           .filter(gpc -> gpc.getCard().equals(cardDTO))
            .findFirst()
            .orElse(null);
+      if (gamePlayerCard == null) return false;
 
-      if (playedCard == null) return false;
+      Card playedCard = gamePlayerCard.getCard();
 
       // Verifies playedCard has the same Color or Value of the last played card
       if (!(playedCard.getColor().equals(game.getCurrentColor()) ||
@@ -199,7 +201,7 @@ public class GameServiceImpl implements GameService {
 
       // Adds the playedCard to playedCards and removes it from the player's deck
       game.getPlayedCards().add(playedCard);
-      playerCards.remove(playedCard);
+      playerCards.remove(gamePlayerCard);
       // Sets currentColor to the lastPlayed card color
       game.setCurrentColor(playedCard.getColor());
       // Sets currentValue to the lastPlayed card value
@@ -220,8 +222,8 @@ public class GameServiceImpl implements GameService {
             break;
          }
          case DRAW_TWO -> {
-            List<Card> nextPlayerDeck = getNextPlayerDeck(game);
-            game.deal(2, nextPlayerDeck);
+            List<GamePlayerCard> nextPlayerDeck = getNextPlayerDeck(game);
+            game.deal(2, nextPlayerDeck.get(0).getGamePlayer());
             break;
          }
          case WILD -> {
@@ -230,8 +232,8 @@ public class GameServiceImpl implements GameService {
          }
          case WILD_DRAW_FOUR -> {
             game.setCurrentColor(playDto.color());
-            List<Card> nextPlayerDeck = getNextPlayerDeck(game);
-            game.deal(4, nextPlayerDeck);
+            List<GamePlayerCard> nextPlayerDeck = getNextPlayerDeck(game);
+            game.deal(4, nextPlayerDeck.get(0).getGamePlayer());
             break;
          }
       }
@@ -260,7 +262,7 @@ public class GameServiceImpl implements GameService {
       return playersArr[newTurnIndex].getPlayer().getId();
    }
 
-   private List<Card> getNextPlayerDeck(Game game) {
+   private List<GamePlayerCard> getNextPlayerDeck(Game game) {
       int newTurnIndex;
 
       GamePlayer[] playersArr = game.getPlayers().toArray(GamePlayer[]::new);

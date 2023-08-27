@@ -56,8 +56,8 @@ public class JwtSecurityConfiguration {
                    "/webjars/**",
                    "/swagger-ui.html"
               ).permitAll();
-              requests.anyRequest().authenticated();
-//              requests.anyRequest().permitAll();
+//              requests.anyRequest().authenticated();
+              requests.anyRequest().permitAll();
            })
            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
            .csrf(AbstractHttpConfigurer::disable)

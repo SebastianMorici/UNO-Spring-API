@@ -2,10 +2,14 @@ package com.sebastian.unobackend.gameplayer;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Embeddable
 public class GamePlayerId implements Serializable {
 
@@ -19,22 +23,6 @@ public class GamePlayerId implements Serializable {
 
    public GamePlayerId(Long gameId, Long playerId) {
       this.gameId = gameId;
-      this.playerId = playerId;
-   }
-
-   public Long getGameId() {
-      return gameId;
-   }
-
-   public void setGameId(Long gameId) {
-      this.gameId = gameId;
-   }
-
-   public Long getPlayerId() {
-      return playerId;
-   }
-
-   public void setPlayerId(Long playerId) {
       this.playerId = playerId;
    }
 

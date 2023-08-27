@@ -2,6 +2,7 @@ package com.sebastian.unobackend.game;
 
 import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.gameplayer.GamePlayer;
+import com.sebastian.unobackend.gameplayer.GamePlayerCard;
 import com.sebastian.unobackend.player.Player;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -67,6 +68,16 @@ public class Game implements Serializable {
 
          Card card = this.deck.remove(0);
          receiver.add(card);
+      }
+   }
+   public void deal(int amount, GamePlayer receiver) {
+      for (int i = 0; i < amount; i++) {
+         if (this.deck.isEmpty()) break;
+
+         Card card = this.deck.remove(0);
+
+         GamePlayerCard gamePlayerCard = new GamePlayerCard(receiver, card);
+         receiver.getPlayerDeck().add(gamePlayerCard);
       }
    }
 

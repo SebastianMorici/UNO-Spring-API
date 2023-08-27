@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/games")
-@SecurityRequirement(name = "bearerAuth")
+//@SecurityRequirement(name = "bearerAuth")
 public class GameController {
 
    private final GameService gameService;
@@ -25,7 +25,7 @@ public class GameController {
    }
 
    @GetMapping()
-   @PreAuthorize("hasRole('ADMIN')")
+//   @PreAuthorize("hasRole('ADMIN')")
    public ResponseEntity<List<GameDTO>> findAll() {
       return ResponseEntity.status(HttpStatus.OK).body(gameService.findAll());
    }
@@ -36,20 +36,20 @@ public class GameController {
    }
 
    @DeleteMapping("/{id}")
-   @PreAuthorize("hasRole('ADMIN')")
+//   @PreAuthorize("hasRole('ADMIN')")
    public ResponseEntity<Void> delete(@PathVariable Long id) {
       gameService.delete(id);
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
    }
 
    @PostMapping("/{id}/players/{playerId}/play")
-   @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
+//   @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
    public ResponseEntity<GameDTO> play(@PathVariable Long id, @PathVariable Long playerId, @Valid @RequestBody PlayDTO playDto) {
       return ResponseEntity.status(HttpStatus.OK).body(gameService.play(id, playerId, playDto));
    }
 
    @GetMapping("/{id}/players/{playerId}/draw")
-   @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
+//   @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
    public ResponseEntity<GameDTO> drawCard(@PathVariable Long id, @PathVariable Long playerId) {
       return ResponseEntity.status(HttpStatus.OK).body(gameService.drawCard(id, playerId));
    }

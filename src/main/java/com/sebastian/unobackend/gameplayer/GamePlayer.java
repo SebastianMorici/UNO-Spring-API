@@ -29,17 +29,10 @@ public class GamePlayer implements Serializable {
    @MapsId("playerId")
    private Player player;
 
-   @ManyToMany
-   @JoinTable(
-        name = "player_deck",
-        joinColumns = {
-             @JoinColumn(name = "game_id", referencedColumnName = "game_id"),
-             @JoinColumn(name = "player_id", referencedColumnName = "player_id")
-        },
-        inverseJoinColumns = @JoinColumn(name = "card_id")
-   )
-   // TODO: Hacer que las cartas vuelvan de la BD en el mismo orden en el que estaban
-   private List<Card> playerDeck = new ArrayList<>();
+   private Date joinedAt;
+
+   @OneToMany(mappedBy = "gamePlayer")
+   private List<GamePlayerCard> playerDeck = new ArrayList<>();
 
    // Constructors
    public GamePlayer() {
@@ -49,6 +42,7 @@ public class GamePlayer implements Serializable {
       this.game = game;
       this.player = player;
       this.id = new GamePlayerId(game.getId(), player.getId());
+      this.joinedAt = new Date();
    }
 
    @Override

@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/players")
-@SecurityRequirement(name = "bearerAuth")
+//@SecurityRequirement(name = "bearerAuth")
 public class PlayerController {
     private final PlayerService playerService;
 
@@ -24,7 +24,7 @@ public class PlayerController {
     }
 
     @GetMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Player>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.findAll());
     }
@@ -40,14 +40,14 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
+//    @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         playerService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/{playerId}/search_game")
-    @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
+//    @PreAuthorize("hasRole('USER') and #playerId == principal.claims['id']")
     public ResponseEntity<GameDTO> searchGame(@PathVariable Long playerId, @Valid @RequestBody SearchGameDTO searchGameDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(playerService.searchGame(playerId, searchGameDTO));
     }
