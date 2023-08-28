@@ -98,7 +98,10 @@ public class PlayerServiceImpl implements PlayerService {
          game.setFull(true);
          gameService.initialize(game.getId());
       }
-      return gameDTOMapper.apply(gameRepository.save(game));
+
+      Game savedGame = gameRepository.save(game);
+      GameDTO gameDTO = gameDTOMapper.apply(savedGame);
+      return gameDTO;
    }
 
 

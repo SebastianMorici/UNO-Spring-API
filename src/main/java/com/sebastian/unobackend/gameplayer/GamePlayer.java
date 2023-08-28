@@ -1,7 +1,5 @@
 package com.sebastian.unobackend.gameplayer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sebastian.unobackend.card.Card;
 import com.sebastian.unobackend.game.Game;
 import com.sebastian.unobackend.player.Player;
 import jakarta.persistence.*;
@@ -9,7 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 
 @Entity
@@ -31,7 +32,11 @@ public class GamePlayer implements Serializable {
 
    private Date joinedAt;
 
-   @OneToMany(mappedBy = "gamePlayer")
+   @OneToMany(
+        mappedBy = "gamePlayer",
+        cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE},
+        orphanRemoval = true
+   )
    private List<GamePlayerCard> playerDeck = new ArrayList<>();
 
    // Constructors

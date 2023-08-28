@@ -5,5 +5,5 @@ import com.sebastian.unobackend.gameplayer.GamePlayerCard;
 
 import java.util.List;
 
-public record GamePlayerDTO(Long playerId, List<GamePlayerCard> playerDeck) {
+public record GamePlayerDTO(Long playerId, List<GamePlayerCardDTO> playerDeck) {
 }
